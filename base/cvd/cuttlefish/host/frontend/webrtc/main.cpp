@@ -16,6 +16,7 @@
 
 #include <libyuv.h>
 
+#include <algorithm>
 #include <memory>
 #include <string_view>
 
@@ -44,6 +45,7 @@
 #include "cuttlefish/host/frontend/webrtc/libdevice/streamer.h"
 #include "cuttlefish/host/frontend/webrtc/libdevice/video_sink.h"
 #include "cuttlefish/host/frontend/webrtc/screenshot_handler.h"
+#include "cuttlefish/host/frontend/webrtc/tuner_audio_source.h"
 #include "cuttlefish/host/frontend/webrtc/webrtc_command_channel.h"
 #include "cuttlefish/host/frontend/webrtc/webrtc_commands.pb.h"
 #include "cuttlefish/host/libs/audio_connector/server.h"
@@ -84,6 +86,10 @@ DEFINE_string(action_servers, "",
               "A comma-separated list of server_name:fd pairs, "
               "where each entry corresponds to one custom action server.");
 DEFINE_int32(audio_server_fd, -1, "An fd to listen on for audio frames");
+DEFINE_string(tuner_pcm_socket_path, "",
+              "Path to the virtual tuner daemon's PCM socket. Feeds the "
+              "capture stream marked virtual_tuner in the guest audio "
+              "config.");
 DEFINE_int32(camera_streamer_fd, -1, "An fd to send client camera frames");
 DEFINE_int32(sensors_fd, -1, "An fd to communicate with sensors_simulator.");
 DEFINE_string(client_dir, "webrtc", "Location of the client files");
@@ -240,7 +246,11 @@ cuttlefish::AudioStreamSettings ParseAudioStreamSettings(
   cuttlefish::AudioStreamSettings settings = {
       .id = static_cast<uint8_t>(id),
       .channels_layout = ConvertChannelLayout(stream.channel_layout()),
-      .direction = direction};
+      .direction = direction,
+      .virtual_tuner = stream.virtual_tuner()};
+  CHECK(!settings.virtual_tuner ||
+        direction == AudioStreamSettings::Direction::Capture)
+      << "Stream " << id << ": virtual_tuner is only valid on capture streams";
   if (stream.has_controls()) {
     const auto& controls = stream.controls();
     settings.has_mute_control = controls.mute_control_enabled();
@@ -308,9 +318,35 @@ std::shared_ptr<AudioHandler> SetupAudio(
   auto audio_server = CreateAudioServer();
   auto audio_source = streamer.GetAudioSource();
 
-  return std::make_shared<AudioHandler>(std::move(audio_server),
-                                        std::move(audio_sink), audio_source,
-                                        streams, mixer_settings);
+  std::shared_ptr<AudioHandler> handler = std::make_shared<AudioHandler>(
+      std::move(audio_server), std::move(audio_sink), audio_source, streams,
+      mixer_settings);
+  CHECK_LE(std::count_if(
+               streams.cbegin(), streams.cend(),
+               [](const AudioStreamSettings& s) { return s.virtual_tuner; }),
+           1)
+      << "At most one capture stream may set virtual_tuner";
+  auto tuner_stream = std::find_if(
+      streams.cbegin(), streams.cend(),
+      [](const AudioStreamSettings& s) { return s.virtual_tuner; });
+  if (tuner_stream == streams.cend()) {
+    if (!FLAGS_tuner_pcm_socket_path.empty()) {
+      LOG(WARNING) << "--tuner_pcm_socket_path is set, but the guest audio "
+                      "config has no virtual_tuner capture stream";
+    }
+  } else if (FLAGS_tuner_pcm_socket_path.empty()) {
+    LOG(WARNING) << "Capture stream " << static_cast<int>(tuner_stream->id)
+                 << " is marked virtual_tuner, but --tuner_pcm_socket_path is "
+                    "not set. It is fed from the WebRTC client instead.";
+  } else {
+    handler->SetCaptureSource(
+        tuner_stream->id,
+        std::make_shared<TunerAudioSource>(FLAGS_tuner_pcm_socket_path));
+    LOG(INFO) << "Virtual tuner audio on capture stream "
+              << static_cast<int>(tuner_stream->id) << " from "
+              << FLAGS_tuner_pcm_socket_path;
+  }
+  return handler;
 }
 
 int CuttlefishMain() {

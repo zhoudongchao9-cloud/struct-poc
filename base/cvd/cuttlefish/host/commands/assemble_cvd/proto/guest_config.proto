@@ -102,6 +102,7 @@ message Audio {
       uint32 id = 1;
       ChannelLayout channel_layout = 2;
       Controls controls = 3;
+      bool virtual_tuner = 4;
     }
     repeated Stream capture_streams = 1;
     repeated Stream playback_streams = 2;
