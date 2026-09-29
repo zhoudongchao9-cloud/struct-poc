@@ -141,7 +141,6 @@ class SharedFD {
   static SharedFD Open(const std::string& pathname, int flags, mode_t mode = 0);
   static bool Pipe(SharedFD* fd0, SharedFD* fd1);
 #ifdef __linux__
-  static SharedFD Event(int initval = 0, int flags = 0);
   static SharedFD ShmOpen(const std::string& name, int oflag, int mode);
 #endif
   static SharedFD MemfdCreateWithData(const std::string& name,
@@ -186,16 +185,8 @@ class SharedFD {
   // necessary.
   // TODO: combining them when vhost-user-vsock impl supports a kind of
   // VMADDR_CID_HOST
-  static SharedFD VsockServer(unsigned int port, int type,
-                              std::optional<int> vhost_user_vsock_listening_cid,
-                              unsigned int cid = VMADDR_CID_ANY);
-  static SharedFD VsockServer(
-      int type, std::optional<int> vhost_user_vsock_listening_cid);
   static SharedFD VsockClient(unsigned int cid, unsigned int port, int type,
                               bool vhost_user);
-  static std::string GetVhostUserVsockServerAddr(
-      unsigned int port, int vhost_user_vsock_listening_cid);
-  static std::string GetVhostUserVsockClientAddr(int cid);
 #endif
 
   auto operator<=>(const SharedFD&) const = default;

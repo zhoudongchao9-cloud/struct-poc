@@ -23,13 +23,19 @@
 #include "cuttlefish/host/commands/assemble_cvd/flags/gpu_mode.h"
 #include "cuttlefish/host/commands/assemble_cvd/flags/guest_enforce_security.h"
 #include "cuttlefish/host/commands/assemble_cvd/flags/memory_mb.h"
+#include "cuttlefish/host/commands/assemble_cvd/flags/qemu_binary_dir.h"
 #include "cuttlefish/host/commands/assemble_cvd/flags/restart_subprocesses.h"
+#include "cuttlefish/host/commands/assemble_cvd/flags/super_image.h"
 #include "cuttlefish/host/commands/assemble_cvd/flags/system_image_dir.h"
+#include "cuttlefish/host/commands/assemble_cvd/flags/vendor_boot_image.h"
 #include "cuttlefish/result/result.h"
 
 namespace cuttlefish {
 
 Result<ParsedFlags> GetParsedFlags() {
+  const SystemImageDirFlag system_image_dir =
+      CF_EXPECT(SystemImageDirFlag::FromGlobalGflags());
+
   return ParsedFlags{
       .cpus = CF_EXPECT(CpusFlag::FromGlobalGflags()),
       .daemon = CF_EXPECT(DaemonFlag::FromGlobalGflags()),
@@ -39,9 +45,12 @@ Result<ParsedFlags> GetParsedFlags() {
       .guest_enforce_security =
           CF_EXPECT(GuestEnforceSecurityFlag::FromGlobalGflags()),
       .memory_mb = CF_EXPECT(MemoryMbFlag::FromGlobalGflags()),
+      .qemu_binary_dir = CF_EXPECT(QemuBinaryDirFlag::FromGlobalGflags()),
       .restart_subprocesses =
           CF_EXPECT(RestartSubprocessesFlag::FromGlobalGflags()),
-      .system_image_dir = CF_EXPECT(SystemImageDirFlag::FromGlobalGflags()),
+      .super_image = SuperImageFlag::FromGlobalGflags(system_image_dir),
+      .system_image_dir = system_image_dir,
+      .vendor_boot = VendorBootImageFlag::FromGlobalGflags(system_image_dir),
   };
 }
 

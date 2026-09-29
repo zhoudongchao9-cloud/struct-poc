@@ -23,8 +23,11 @@
 #include "cuttlefish/host/commands/assemble_cvd/flags/gpu_mode.h"
 #include "cuttlefish/host/commands/assemble_cvd/flags/guest_enforce_security.h"
 #include "cuttlefish/host/commands/assemble_cvd/flags/memory_mb.h"
+#include "cuttlefish/host/commands/assemble_cvd/flags/qemu_binary_dir.h"
 #include "cuttlefish/host/commands/assemble_cvd/flags/restart_subprocesses.h"
+#include "cuttlefish/host/commands/assemble_cvd/flags/super_image.h"
 #include "cuttlefish/host/commands/assemble_cvd/flags/system_image_dir.h"
+#include "cuttlefish/host/commands/assemble_cvd/flags/vendor_boot_image.h"
 
 namespace cuttlefish {
 
@@ -36,8 +39,11 @@ struct ParsedFlags {
   GpuModeFlag gpu_mode;
   GuestEnforceSecurityFlag guest_enforce_security;
   MemoryMbFlag memory_mb;
+  QemuBinaryDirFlag qemu_binary_dir;
   RestartSubprocessesFlag restart_subprocesses;
+  SuperImageFlag super_image;
   SystemImageDirFlag system_image_dir;
+  VendorBootImageFlag vendor_boot;
 };
 
 // depends on gflags::ParseCommandLineFlags being called previously
