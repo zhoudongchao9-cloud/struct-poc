@@ -121,10 +121,7 @@ jobs:
       pull-requests: 'write'
     with:
       additional_context: '${{ needs.dispatch.outputs.additional_context }}'
-    secrets:
-      APP_PRIVATE_KEY: '${{ secrets.APP_PRIVATE_KEY }}'
-      GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY }}'
-      GOOGLE_API_KEY: '${{ secrets.GOOGLE_API_KEY }}'
+    secrets: inherit
 
   invoke:
     needs: 'dispatch'
@@ -137,10 +134,7 @@ jobs:
       pull-requests: 'write'
     with:
       additional_context: '${{ needs.dispatch.outputs.additional_context }}'
-    secrets:
-      APP_PRIVATE_KEY: '${{ secrets.APP_PRIVATE_KEY }}'
-      GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY }}'
-      GOOGLE_API_KEY: '${{ secrets.GOOGLE_API_KEY }}'
+    secrets: inherit
 
   plan-execute:
     needs: 'dispatch'
@@ -153,10 +147,7 @@ jobs:
       pull-requests: 'write'
     with:
       additional_context: '${{ needs.dispatch.outputs.additional_context }}'
-    secrets:
-      APP_PRIVATE_KEY: '${{ secrets.APP_PRIVATE_KEY }}'
-      GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY }}'
-      GOOGLE_API_KEY: '${{ secrets.GOOGLE_API_KEY }}'
+    secrets: inherit
 
   fallthrough:
     needs:
