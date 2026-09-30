@@ -82,7 +82,7 @@ jobs:
                 "outfile": ".gemini/telemetry.log"
               },
               "mcpServers": {
-                "github": {
+                "gh": {
                   "command": "docker",
                   "args": [
                     "run",
