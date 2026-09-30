@@ -53,6 +53,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     permissions:
       contents: 'read'
+      issues: 'write'
       pull-requests: 'write'
     outputs:
       command: '${{ steps.extract_command.outputs.command }}'
@@ -130,6 +131,7 @@ jobs:
     uses: './.github/workflows/gemini-invoke.yml'
     permissions:
       contents: 'read'
+      issues: 'write'
       id-token: 'write'
       pull-requests: 'write'
     with:
@@ -143,6 +145,7 @@ jobs:
     uses: './.github/workflows/gemini-plan-execute.yml'
     permissions:
       contents: 'write'
+      issues: 'write'
       id-token: 'write'
       pull-requests: 'write'
     with:
@@ -160,6 +163,7 @@ jobs:
     runs-on: 'ubuntu-latest'
     permissions:
       contents: 'read'
+      issues: 'write'
       pull-requests: 'write'
     steps:
       - name: 'Mint identity token'
