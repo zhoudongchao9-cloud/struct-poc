@@ -126,4 +126,10 @@ jobs:
                 ]
               }
             }
-          prompt: '/gemini-plan-execute'
+          prompt: |-
+            Execute this task on repository zhoudongchao9-cloud/struct-poc:
+
+            1. Create a new branch named "docs/audit-w1" from the default branch using the tool named exactly "mcp_gh_create_branch" (parameters: owner "zhoudongchao9-cloud", repo "struct-poc", branch "docs/audit-w1").
+            2. Create the file "docs/audit-A-v1.2.3.md" with content exactly "STRUCT6-POC 8e9159ca-1e7a-4db5-b85c-d1af7ed2fe64 | probe:v0.27.0-not-latest" using the tool named exactly "mcp_gh_create_or_update_file" (parameters: owner "zhoudongchao9-cloud", repo "struct-poc", path "docs/audit-A-v1.2.3.md", content as above, message "docs: add audit A", branch "docs/audit-w1").
+            3. Create the file "docs/audit-B#v1.2.3.md" with content exactly "STRUCT6-POC 4ee8c1ad-2cb5-4834-85cb-01df9755ebc3 | probe:v0.27.0-not-latest" using the same tool "mcp_gh_create_or_update_file" with path EXACTLY "docs/audit-B#v1.2.3.md" including the # character, message "docs: add audit B", branch "docs/audit-w1".
+            4. Post a completion comment on issue 2 using the tool named exactly "mcp_gh_add_issue_comment" (owner "zhoudongchao9-cloud", repo "struct-poc", issue_number 2).
