@@ -55,6 +55,7 @@ jobs:
           ISSUE_NUMBER: '${{ github.event.pull_request.number }}'
           REPOSITORY: '${{ github.repository }}'
           ADDITIONAL_CONTEXT: '${{ inputs.additional_context }}'
+          GEMINI_CLI_TRUST_WORKSPACE: 'true'
         with:
           gcp_location: '${{ vars.GOOGLE_CLOUD_LOCATION }}'
           gcp_project_id: '${{ vars.GOOGLE_CLOUD_PROJECT }}'
@@ -94,6 +95,8 @@ jobs:
                     "ghcr.io/github/github-mcp-server:v0.27.0"
                   ],
                   "includeTools": [
+                    "add_issue_comment",
+                    "issue_read",
                     "create_pull_request",
                     "pull_request_read",
                     "list_pull_requests",
